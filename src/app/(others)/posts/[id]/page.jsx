@@ -1,5 +1,5 @@
-import Comments from '@/components/Comments';
-import Post from '@/components/Post';
+import Comments from '../../../components/Comments';
+import Post from '../../../components/Post';
 import Link from 'next/link';
 import { HiArrowLeft } from 'react-icons/hi';
 
