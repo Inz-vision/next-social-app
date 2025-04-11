@@ -22,14 +22,18 @@ export default function Sidebar() {
           <HiHome className='w-7 h-7' />
           <span className='font-bold hidden xl:inline'>Home</span>
         </Link>
-        <button className='bg-blue-400 text-white rounded-full  hover:brightness-95 transition-all duration-200 w-48 h-9 shadow-md hidden xl:inline font-semibold'>
+        <div className='bg-blue-400 text-white rounded-full hover:brightness-95 transition-all duration-200 w-48 h-9 shadow-md hidden xl:flex items-center justify-center font-semibold'>
           <SignedIn>
-            <SignOutButton />
+            <div className='flex items-center justify-center w-full h-full'>
+              <SignOutButton />
+            </div>
           </SignedIn>
           <SignedOut>
-            <SignInButton />
+            <div className='flex items-center justify-center w-full h-full'>
+              <SignInButton />
+            </div>
           </SignedOut>
-        </button>
+        </div>
       </div>
       <SignedIn>
         <MiniProfile />

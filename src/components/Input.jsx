@@ -3,7 +3,7 @@
 import { useUser } from '@clerk/nextjs';
 import { HiOutlinePhotograph } from 'react-icons/hi';
 import { useRef, useState, useEffect } from 'react';
-import { app } from '../../firebase';
+import { app } from '../firebase';
 import {
   getStorage,
   ref,

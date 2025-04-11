@@ -1,5 +1,5 @@
-import Post from '../../../lib/models/post.model.js';
-import { connect } from '../../../lib/mongodb/mongoose.js';
+import Post from '../../../../lib/models/post.model.js';
+import { connect } from '../../../../lib/mongodb/mongoose.js';
 
 export const POST = async (req) => {
   try {

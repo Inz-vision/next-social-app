@@ -1,7 +1,7 @@
 import { HiArrowLeft } from 'react-icons/hi';
 import Link from 'next/link';
-import Post from '../../../components/Post';
-import FollowButton from '../../../components/FollowButton';
+import Post from '../../../../components/Post';
+import FollowButton from '../../../../components/FollowButton';
 
 export default async function UserPage({ params }) {
   let data = null;

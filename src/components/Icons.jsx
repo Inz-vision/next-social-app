@@ -9,7 +9,7 @@ import {
 import { useState, useEffect } from 'react';
 import { useUser } from '@clerk/nextjs';
 import { useRouter } from 'next/navigation';
-import { useModalStore } from '../../store/modalStore'; // Import Zustand store
+import { useModalStore } from '../store/modalStore'; // Import Zustand store
 
 export default function Icons({ post }) {
   const [isLiked, setIsLiked] = useState(false);

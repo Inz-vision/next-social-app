@@ -1,4 +1,4 @@
-import Post from '../../../components/Post';
+import Post from '../../../../components/Post';
 import Link from 'next/link';
 import { HiArrowLeft } from 'react-icons/hi';
 
@@ -10,7 +10,14 @@ export default async function SearchPage({ params }) {
       method: 'POST',
       body: JSON.stringify({ searchTerm: params.searchTerm }),
       cache: 'no-store',
+      headers: {
+        'Content-Type': 'application/json', // Added Content-Type header for POST request
+      },
     });
+
+    if (!result.ok) {
+        throw new Error('Failed to fetch search results');
+      }
 
     data = await result.json();
     console.log(data);

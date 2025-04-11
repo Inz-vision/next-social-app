@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useModalStore } from '../../store/modalStore'; // Assuming modalStore is in the `store` folder
+import { useModalStore } from '../store/modalStore'; // Assuming modalStore is in the `store` folder
 import Modal from 'react-modal';
 import { HiX } from 'react-icons/hi';
 import { useUser } from '@clerk/nextjs';

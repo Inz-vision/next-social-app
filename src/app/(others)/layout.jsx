@@ -1,20 +1,21 @@
-import { Geist, Geist_Mono } from "next/font/google";
-import ".././globals.css";
-import LeftSidebar from '../components/LeftSidebar';
-import RightSidebar from '../components/RightSidebar';
-import SessionWrapper from '../components/SessionWrapper';
+import localFont from 'next/font/local';
+import '.././globals.css';
+import LeftSidebar from '../../components/LeftSidebar';
+import RightSidebar from '../../components/RightSidebar';
+import SessionWrapper from '../../components/SessionWrapper';
 import { ClerkProvider, ClerkLoaded, ClerkLoading } from '@clerk/nextjs';
-import Loader from '../components/Loader';
-import CommentModal from '../components/CommentModal';
+import Loader from '../../components/Loader';
+import CommentModal from '../../components/CommentModal';
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
+const geistSans = localFont({
+  src: '.././fonts/GeistVF.woff',
+  variable: '--font-geist-sans',
+  weight: '100 900',
 });
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
+const geistMono = localFont({
+  src: '.././fonts/GeistMonoVF.woff',
+  variable: '--font-geist-mono',
+  weight: '100 900',
 });
 
 export const metadata = {
