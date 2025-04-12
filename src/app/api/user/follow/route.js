@@ -1,86 +1,54 @@
 import User from '../../../../lib/models/user.model';
 import { connect } from '../../../../lib/mongodb/mongoose';
-import { currentUser } from '@clerk/nextjs/server';
 
 export const POST = async (req) => {
   try {
     await connect();
+    const { userProfileId, userWhofollowsId } = await req.json();
 
-    const user = await currentUser();
-    console.log('Current User:', user);
-    console.log('user.publicMetadata.userMongoId:', user?.publicMetadata?.userMongoId);
+    console.log('Fetching user who follows with ID:', userWhofollowsId);
+    const userWhoFollows = await User.findById(userWhofollowsId);
 
-    const data = await req.json();
-    console.log('Request Data:', data);
-
-    const userProfileId = data.userProfileId;
-    const userWhoFollowsId = data.userWhofollowsId;
-
-    if (!user || user.publicMetadata.userMongoId !== userWhoFollowsId) {
-      console.error('Unauthorized: User Mongo ID mismatch or missing.');
-      return new Response(
-        JSON.stringify({ error: 'Unauthorized' }),
-        { status: 401 }
-      );
-    }
-
-    if (!userProfileId || !userWhoFollowsId) {
-      console.error('Invalid request data:', data);
-      return new Response(
-        JSON.stringify({ error: 'Invalid request data' }),
-        { status: 400 }
-      );
-    }
-
-    const [userWhoFollowsFromMongoDB, userProfileIdFromMongoDB] = await Promise.all([
-      User.findById(userWhoFollowsId),
-      User.findById(userProfileId),
-    ]);
-
-    console.log('User who follows from MongoDB:', userWhoFollowsFromMongoDB);
-    console.log('User to follow from MongoDB:', userProfileIdFromMongoDB);
-
-    if (!userWhoFollowsFromMongoDB) {
+    if (!userWhoFollows) {
+      console.error('User who follows not found in the db');
       return new Response(
         JSON.stringify({ error: 'User who follows not found in the db' }),
         { status: 404 }
       );
     }
 
-    if (!userProfileIdFromMongoDB) {
+    console.log('Fetching user to follow with ID:', userProfileId);
+    const userToFollow = await User.findById(userProfileId);
+
+    if (!userToFollow) {
+      console.error('User to follow not found in the db');
       return new Response(
         JSON.stringify({ error: 'User to follow not found in the db' }),
         { status: 404 }
       );
     }
 
-    const isFollowing = userWhoFollowsFromMongoDB.following.find(
-      (item) => item.toString() === userProfileIdFromMongoDB._id.toString()
-    );
+    const isFollowing = userWhoFollows.following.includes(userProfileId);
 
     if (isFollowing) {
-      userWhoFollowsFromMongoDB.following = userWhoFollowsFromMongoDB.following.filter(
-        (item) => item.toString() !== userProfileIdFromMongoDB._id.toString()
+      // Unfollow logic
+      userWhoFollows.following = userWhoFollows.following.filter(
+        (id) => id.toString() !== userProfileId
       );
-      userProfileIdFromMongoDB.followers = userProfileIdFromMongoDB.followers.filter(
-        (item) => item.toString() !== userWhoFollowsFromMongoDB._id.toString()
+      userToFollow.followers = userToFollow.followers.filter(
+        (id) => id.toString() !== userWhofollowsId
       );
     } else {
-      userWhoFollowsFromMongoDB.following.push(userProfileIdFromMongoDB._id);
-      userProfileIdFromMongoDB.followers.push(userWhoFollowsFromMongoDB._id);
+      // Follow logic
+      userWhoFollows.following.push(userProfileId);
+      userToFollow.followers.push(userWhofollowsId);
     }
 
-    await Promise.all([
-      userWhoFollowsFromMongoDB.save(),
-      userProfileIdFromMongoDB.save(),
-    ]);
-
-    console.log('After update - userWhoFollows:', userWhoFollowsFromMongoDB);
-    console.log('After update - userProfile:', userProfileIdFromMongoDB);
+    await Promise.all([userWhoFollows.save(), userToFollow.save()]);
 
     return new Response(JSON.stringify({ success: true }), { status: 200 });
-  } catch (err) {
-    console.error('Error in follow route:', err.stack);
+  } catch (error) {
+    console.error('Error in follow route:', error.stack);
     return new Response(
       JSON.stringify({ error: 'Failed to follow/unfollow user' }),
       { status: 500 }
