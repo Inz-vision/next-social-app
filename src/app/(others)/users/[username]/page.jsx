@@ -19,6 +19,8 @@ export default async function UserPage({ params }) {
     });
 
     if (!result.ok) {
+      const errorText = await result.text(); // Get the raw response text for debugging
+      console.error('Error fetching user data:', errorText);
       throw new Error('Failed to fetch user data');
     }
 
@@ -35,6 +37,8 @@ export default async function UserPage({ params }) {
     });
 
     if (!userPosts.ok) {
+      const errorText = await userPosts.text(); // Get the raw response text for debugging
+      console.error('Error fetching user posts:', errorText);
       throw new Error('Failed to fetch user posts');
     }
 

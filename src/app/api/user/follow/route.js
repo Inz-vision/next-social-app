@@ -8,6 +8,7 @@ export const POST = async (req) => {
 
     const user = await currentUser();
     console.log('Current User:', user);
+    console.log('user.publicMetadata.userMongoId:', user?.publicMetadata?.userMongoId);
 
     const data = await req.json();
     console.log('Request Data:', data);
@@ -22,10 +23,20 @@ export const POST = async (req) => {
       );
     }
 
+    if (!userProfileId || !userWhoFollowsId) {
+      return new Response(
+        JSON.stringify({ error: 'Invalid request data' }),
+        { status: 400 }
+      );
+    }
+
     const [userWhoFollowsFromMongoDB, userProfileIdFromMongoDB] = await Promise.all([
       User.findById(userWhoFollowsId),
       User.findById(userProfileId),
     ]);
+
+    console.log('User who follows from MongoDB:', userWhoFollowsFromMongoDB);
+    console.log('User to follow from MongoDB:', userProfileIdFromMongoDB);
 
     if (!userWhoFollowsFromMongoDB) {
       return new Response(
@@ -54,7 +65,6 @@ export const POST = async (req) => {
     );
 
     if (isFollowing) {
-      // Unfollow logic
       userWhoFollowsFromMongoDB.following = userWhoFollowsFromMongoDB.following.filter(
         (item) => item.toString() !== userProfileIdFromMongoDB._id.toString()
       );
@@ -62,7 +72,6 @@ export const POST = async (req) => {
         (item) => item.toString() !== userWhoFollowsFromMongoDB._id.toString()
       );
     } else {
-      // Follow logic
       userWhoFollowsFromMongoDB.following.push(userProfileIdFromMongoDB._id);
       userProfileIdFromMongoDB.followers.push(userWhoFollowsFromMongoDB._id);
     }
@@ -72,9 +81,12 @@ export const POST = async (req) => {
       userProfileIdFromMongoDB.save(),
     ]);
 
+    console.log('After update - following:', userWhoFollowsFromMongoDB.following);
+    console.log('After update - followers:', userProfileIdFromMongoDB.followers);
+
     return new Response(JSON.stringify({ success: true }), { status: 200 });
   } catch (err) {
-    console.error('Error in follow route:', err);
+    console.error('Error in follow route:', err.stack);
     return new Response(
       JSON.stringify({ error: 'Failed to follow/unfollow user' }),
       { status: 500 }

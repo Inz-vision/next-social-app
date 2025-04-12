@@ -32,13 +32,6 @@ export const createOrUpdateUser = async (
     console.log('Error creating or updating user:', error);    
     throw error;
   }
-  console.log('Creating or updating user in MongoDB:', {
-    id,
-    first_name,
-    last_name,
-    email_addresses,
-    username,
-  });
 };
 
 export const deleteUser = async (id) => {

@@ -8,8 +8,8 @@ export default function FollowButton({ user: userFromProfilePage }) {
   const { user } = useUser();
 
   const handleFollow = async () => {
-    if (!user.publicMetadata.userMongoId) {
-      console.error('User Mongo ID is missing.');
+    if (!user || !user.publicMetadata || !user.publicMetadata.userMongoId) {
+      console.error('User Mongo ID is missing or not set in publicMetadata.');
       return;
     }
 
@@ -30,10 +30,10 @@ export default function FollowButton({ user: userFromProfilePage }) {
       const result = await res.json();
 
       if (res.status === 200) {
-        console.log(result.message);
+        console.log('Follow action successful:', result.message);
         router.refresh();
       } else {
-        console.error(result.error);
+        console.error('Follow action failed:', result.error);
       }
     } catch (error) {
       console.error('Failed to follow/unfollow user:', error);
