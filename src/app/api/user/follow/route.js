@@ -17,6 +17,7 @@ export const POST = async (req) => {
     const userWhoFollowsId = data.userWhofollowsId;
 
     if (!user || user.publicMetadata.userMongoId !== userWhoFollowsId) {
+      console.error('Unauthorized: User Mongo ID mismatch or missing.');
       return new Response(
         JSON.stringify({ error: 'Unauthorized' }),
         { status: 401 }
@@ -24,6 +25,7 @@ export const POST = async (req) => {
     }
 
     if (!userProfileId || !userWhoFollowsId) {
+      console.error('Invalid request data:', data);
       return new Response(
         JSON.stringify({ error: 'Invalid request data' }),
         { status: 400 }
@@ -52,14 +54,6 @@ export const POST = async (req) => {
       );
     }
 
-    // Prevent user from following themselves
-    if (userWhoFollowsFromMongoDB._id.toString() === userProfileIdFromMongoDB._id.toString()) {
-      return new Response(
-        JSON.stringify({ error: 'You cannot follow yourself' }),
-        { status: 400 }
-      );
-    }
-
     const isFollowing = userWhoFollowsFromMongoDB.following.find(
       (item) => item.toString() === userProfileIdFromMongoDB._id.toString()
     );
@@ -81,8 +75,8 @@ export const POST = async (req) => {
       userProfileIdFromMongoDB.save(),
     ]);
 
-    console.log('After update - following:', userWhoFollowsFromMongoDB.following);
-    console.log('After update - followers:', userProfileIdFromMongoDB.followers);
+    console.log('After update - userWhoFollows:', userWhoFollowsFromMongoDB);
+    console.log('After update - userProfile:', userProfileIdFromMongoDB);
 
     return new Response(JSON.stringify({ success: true }), { status: 200 });
   } catch (err) {

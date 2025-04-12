@@ -4,14 +4,22 @@ import { connect } from '../../../../lib/mongodb/mongoose';
 export const POST = async (req) => {
   try {
     await connect();
+    const { username } = await req.json();
 
-    const data = await req.json();
+    console.log('Fetching user with username:', username);
 
-    const user = await User.findOne({ username: data.username });
+    const user = await User.findOne({ username });
+
+    if (!user) {
+      console.error('User not found for username:', username);
+      return new Response(JSON.stringify(null), { status: 404 });
+    }
+
+    console.log('Found User:', user);
 
     return new Response(JSON.stringify(user), { status: 200 });
-  } catch (err) {
-    console.log(err);
-    return new Response('Failed to fetch the user data', { status: 500 });
+  } catch (error) {
+    console.error('Error fetching user:', error);
+    return new Response('Error fetching user', { status: 500 });
   }
 };

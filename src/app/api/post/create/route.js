@@ -15,7 +15,12 @@ export const POST = async (req) => {
       });
     }
 
-    // Convert userMongoId to ObjectId
+    // Validate and convert userMongoId to ObjectId
+    if (!mongoose.Types.ObjectId.isValid(data.userMongoId)) {
+      return new Response('Invalid userMongoId', {
+        status: 400,
+      });
+    }
     const userObjectId = new mongoose.Types.ObjectId(data.userMongoId);
 
     const newPost = await Post.create({
