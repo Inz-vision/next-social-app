@@ -52,6 +52,7 @@ export async function POST(req) {
   if (eventType === 'user.created' || eventType === 'user.updated') {
     const { id, first_name, last_name, image_url, email_addresses, username } = evt?.data;
     try {
+      // Create or update the user in MongoDB
       const user = await createOrUpdateUser(
         id,
         first_name,
@@ -60,22 +61,25 @@ export async function POST(req) {
         email_addresses,
         username
       );
-      console.log('Created/Updated User:', user);
-
+      console.log('Created/Updated User in MongoDB:', user);
+  
       if (user) {
         try {
+          // Update Clerk's publicMetadata with the MongoDB _id
           await clerkClient.users.updateUserMetadata(id, {
             publicMetadata: {
-              userMongoId: user._id.toString(),
+              userMongoId: user._id.toString(), // Ensure MongoDB _id is stored
             },
           });
           console.log('Updated Clerk publicMetadata for user:', id);
         } catch (error) {
-          console.error('Error updating user metadata:', error.stack);
+          console.error('Error updating user metadata in Clerk:', error.stack);
         }
+      } else {
+        console.error('User not found or created in MongoDB');
       }
     } catch (error) {
-      console.error('Error creating or updating user:', error.stack);
+      console.error('Error creating or updating user in MongoDB:', error.stack);
       return new Response('Error occurred', {
         status: 400,
       });

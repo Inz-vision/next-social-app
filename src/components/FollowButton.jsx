@@ -10,6 +10,7 @@ export default function FollowButton({ user: userFromProfilePage }) {
   const handleFollow = async () => {
     if (!user || !user.publicMetadata || !user.publicMetadata.userMongoId) {
       console.error('User Mongo ID is missing or not set in publicMetadata.');
+      alert('Your account is not fully set up. Please contact support.');
       return;
     }
 

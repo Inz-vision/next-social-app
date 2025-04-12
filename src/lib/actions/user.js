@@ -20,16 +20,22 @@ export const createOrUpdateUser = async (
           firstName: first_name,
           lastName: last_name,
           avatar: image_url,
-          email: email_addresses[0].email_address,
+          email: email_addresses[0]?.email_address || '', // Handle missing email
           username,
         },
       },
-      { new: true, upsert: true }
-    );    
+      { new: true, upsert: true } // Return the updated document and create if not found
+    );
 
-    return user;
+    if (!user) {
+      console.error('Failed to create or update user in MongoDB');
+      throw new Error('Failed to create or update user');
+    }
+
+    console.log('User created/updated in MongoDB:', user);
+    return user; // Ensure the user object with _id is returned
   } catch (error) {
-    console.log('Error creating or updating user:', error);    
+    console.error('Error creating or updating user:', error);
     throw error;
   }
 };
@@ -37,8 +43,20 @@ export const createOrUpdateUser = async (
 export const deleteUser = async (id) => {
   try {
     await connect();
-    await User.findOneAndDelete({ clerkId: id });
+
+    // Find and delete the user
+    const user = await User.findOneAndDelete({ clerkId: id });
+
+    if (user) {
+      console.log(`Deleted user with Clerk ID: ${id} and MongoDB ID: ${user._id}`);
+
+      // Optionally, delete related data (e.g., posts, followers)
+      // Example: await Post.deleteMany({ user: user._id });
+    } else {
+      console.log(`No user found with Clerk ID: ${id}`);
+    }
   } catch (error) {
-    console.log('Error deleting user:', error);
+    console.error('Error deleting user:', error);
+    throw error;
   }
 };
