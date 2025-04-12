@@ -4,22 +4,43 @@ import Post from '../../../../components/Post';
 import FollowButton from '../../../../components/FollowButton';
 
 export default async function UserPage({ params }) {
+  const { username } = await params; // Destructure params synchronously
   let data = null;
+
   try {
+    // Fetch user data
     const result = await fetch(process.env.URL + '/api/user/get', {
       method: 'POST',
-      body: JSON.stringify({ username: params.username }),
+      body: JSON.stringify({ username }), // Use destructured username here
       cache: 'no-store',
+      headers: {
+        'Content-Type': 'application/json',
+      },
     });
+
+    if (!result.ok) {
+      throw new Error('Failed to fetch user data');
+    }
+
     data = await result.json();
+
+    // Fetch user posts
     const userPosts = await fetch(process.env.URL + '/api/post/user/get', {
       method: 'POST',
       body: JSON.stringify({ userId: data._id }),
       cache: 'no-store',
+      headers: {
+        'Content-Type': 'application/json',
+      },
     });
+
+    if (!userPosts.ok) {
+      throw new Error('Failed to fetch user posts');
+    }
+
     data.posts = await userPosts.json();
   } catch (error) {
-    console.error('Failed to fetch post', error);
+    console.error('Error fetching user or posts:', error);
   }
 
   return (

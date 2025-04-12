@@ -11,6 +11,8 @@ export const createOrUpdateUser = async (
 ) => {
   try {
     await connect();
+
+    // Create or update the user in MongoDB
     const user = await User.findOneAndUpdate(
       { clerkId: id },
       {
@@ -23,11 +25,20 @@ export const createOrUpdateUser = async (
         },
       },
       { new: true, upsert: true }
-    );
+    );    
+
     return user;
   } catch (error) {
-    console.log('Error creating or updating user:', error);
+    console.log('Error creating or updating user:', error);    
+    throw error;
   }
+  console.log('Creating or updating user in MongoDB:', {
+    id,
+    first_name,
+    last_name,
+    email_addresses,
+    username,
+  });
 };
 
 export const deleteUser = async (id) => {

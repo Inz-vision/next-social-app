@@ -81,6 +81,8 @@ export async function POST(req) {
       }
     } catch (error) {
       console.log('Error creating or updating user:', error);
+      console.log(`Webhook received: ${eventType}`);
+      console.log('Event data:', evt?.data);
       return new Response('Error occured', {
         status: 400,
       });

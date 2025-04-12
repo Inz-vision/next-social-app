@@ -6,23 +6,40 @@ import { useRouter } from 'next/navigation';
 export default function FollowButton({ user: userFromProfilePage }) {
   const router = useRouter();
   const { user } = useUser();
+
   const handleFollow = async () => {
+    if (!user.publicMetadata.userMongoId) {
+      console.error('User Mongo ID is missing.');
+      return;
+    }
+
+    console.log('user.publicMetadata.userMongoId:', user.publicMetadata.userMongoId);
+
     try {
       const res = await fetch('/api/user/follow', {
         method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
         body: JSON.stringify({
           userProfileId: userFromProfilePage._id,
           userWhofollowsId: user.publicMetadata.userMongoId,
         }),
       });
 
+      const result = await res.json();
+
       if (res.status === 200) {
+        console.log(result.message);
         router.refresh();
+      } else {
+        console.error(result.error);
       }
     } catch (error) {
-      console.error('Failed to follow user', error);
+      console.error('Failed to follow/unfollow user:', error);
     }
   };
+
   return (
     <button
       onClick={handleFollow}

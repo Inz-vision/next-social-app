@@ -2,13 +2,14 @@ import Post from '../../../../components/Post';
 import Link from 'next/link';
 import { HiArrowLeft } from 'react-icons/hi';
 
-
 export default async function SearchPage({ params }) {
+  const { searchTerm } = await params; // Destructure params to access searchTerm
   let data = null;
+
   try {
-    const result = await fetch(process.env.URL + `/api/post/search`, {
+    const result = await fetch(`${process.env.URL}/api/post/search`, {
       method: 'POST',
-      body: JSON.stringify({ searchTerm: params.searchTerm }),
+      body: JSON.stringify({ searchTerm }),
       cache: 'no-store',
       headers: {
         'Content-Type': 'application/json', // Added Content-Type header for POST request
@@ -16,8 +17,8 @@ export default async function SearchPage({ params }) {
     });
 
     if (!result.ok) {
-        throw new Error('Failed to fetch search results');
-      }
+      throw new Error('Failed to fetch search results');
+    }
 
     data = await result.json();
     console.log(data);
@@ -35,7 +36,7 @@ export default async function SearchPage({ params }) {
       </div>
       <div className='border-b p-6'>
         <h1 className='text-center text-lg'>
-          Search results for &quot;{decodeURIComponent(params.searchTerm)}&quot;
+          Search results for &quot;{decodeURIComponent(searchTerm)}&quot;
         </h1>
       </div>
       {data && data.length === 0 && (

@@ -4,13 +4,23 @@ import Link from 'next/link';
 import { HiArrowLeft } from 'react-icons/hi';
 
 export default async function PostPage({ params }) {
+  const { id } = await params; // Destructure params to access id
   let data = null;
+
   try {
-    const result = await fetch(process.env.URL + '/api/post/get', {
+    const result = await fetch(`${process.env.URL}/api/post/get`, {
       method: 'POST',
-      body: JSON.stringify({ postId: params.id }),
+      body: JSON.stringify({ postId: id }), // Use destructured id here
       cache: 'no-store',
+      headers: {
+        'Content-Type': 'application/json', // Ensure Content-Type header is set
+      },
     });
+
+    if (!result.ok) {
+      throw new Error('Failed to fetch post');
+    }
+
     data = await result.json();
   } catch (error) {
     console.log('Error getting post:', error);
